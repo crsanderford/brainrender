@@ -7,6 +7,8 @@ from pathlib import Path
 from myterial import orange, amber, deep_purple_light, teal
 from rich.syntax import Syntax
 
+import k3d
+
 from brainrender import settings
 from brainrender.camera import (
     get_camera,
@@ -210,7 +212,7 @@ class Render:
     def close(self):
         closePlotter()
 
-    def export(self, savepath):
+    def export(self, savepath, alpha_coef=None, vmin=None, vmax=None):
         """
             Exports the scene to a .html
             file for online renderings.
@@ -234,6 +236,14 @@ class Render:
         plt.add(self.renderables)
         plt = plt.show(interactive=False)
         plt.camera[-2] = -1
+
+        # find the indices of the Volume objects in the scene
+        volume_indices = [index for index, x in enumerate(plt.objects) if isinstance(x, k3d.objects.Volume)]
+        for index in volume_indices: # loop over them and apply params if they exist
+            if alpha_coef is not None:
+                plt.objects[index].alpha_coef = alpha_coef
+            if (vmin is not None) and (vmax is not None):
+                plt.objects[index].color_range = [vmin, vmax]
 
         with open(path, "w") as fp:
             fp.write(plt.get_snapshot())
