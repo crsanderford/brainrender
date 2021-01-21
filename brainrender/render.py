@@ -1,7 +1,11 @@
 from vedo import Plotter, closePlotter
 from vedo import settings as vsettings
+
+import vtk
+
 import numpy as np
 from datetime import datetime
+
 from rich import print
 from pathlib import Path
 from myterial import orange, amber, deep_purple_light, teal
@@ -10,6 +14,8 @@ from rich.syntax import Syntax
 import k3d
 
 from brainrender import settings
+from brainrender.actors.volume import Volume as BrVolume
+from brainrender._io import vedo_write
 from brainrender.camera import (
     get_camera,
     check_camera_param,
@@ -17,9 +23,11 @@ from brainrender.camera import (
     get_camera_params,
 )
 
-
 # mtx used to transform meshes to sort axes orientation
-mtx = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+mtx = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
+
+# mtx used to transform meshes to sort axes orientation for k3d rendering
+mtx_html = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
 
 
 class Render:
@@ -90,7 +98,7 @@ class Render:
 
         return axes
 
-    def _prepare_actor(self):
+    def _prepare_actor(self, to_html=False):
         """
             When an actor is first rendered, a transform matrix
             is applied to its points to correct axes orientation
@@ -103,7 +111,10 @@ class Render:
         # Flip every actor's orientation
         for actor in self.clean_actors + self.labels:
             if not actor._is_transformed:
-                actor.applyTransform(mtx)
+                if (to_html == True):
+                    actor.applyTransform(mtx_html)
+                else:
+                    actor.applyTransform(mtx)
                 try:
                     actor.reverse()
                 except AttributeError:  # Volumes don't have reverse
@@ -136,7 +147,7 @@ class Render:
             except AttributeError:
                 pass
 
-    def render(self, interactive=None, camera=None, zoom=1.75, **kwargs):
+    def render(self, interactive=None, camera=None, zoom=1.75, to_html=False, **kwargs):
         """
             Renders the scene.
 
@@ -147,6 +158,7 @@ class Render:
                 Pass a valid camera input to specify the camera position when
                 the scene is rendered.
             :param zoom: float
+            :param to_html: argument to pass to _prepare_actor
             :param kwargs: additional arguments to pass to self.plotter.show
         """
         # get vedo plotter
@@ -163,7 +175,7 @@ class Render:
             camera = set_camera(self, camera)
 
         # Apply axes correction
-        self._prepare_actor()
+        self._prepare_actor(to_html=to_html)
 
         # Apply style
         self._apply_style()
@@ -212,6 +224,29 @@ class Render:
     def close(self):
         closePlotter()
 
+    def export_vtk(self, savepath):
+        """
+            Exports the scene to a .vtk
+            file.
+
+            :param savepath, str, Path to a .vtk file to save the export
+        """
+        if not self.is_rendered:
+            self.render(interactive=False, to_html=False)
+
+        path = Path(savepath)
+        if path.suffix != ".vtm":
+            raise ValueError("Savepath should point to a .vtm file")
+
+        vedo_write(self.renderables, savepath)
+
+        print(
+        f"The brainrender scene has been exported to a .vtm file. The results are saved at {path}"
+        )
+
+        return str(path)
+
+
     def export(self, savepath, alpha_coef=None, vmin=None, vmax=None):
         """
             Exports the scene to a .html
@@ -222,7 +257,7 @@ class Render:
         _jupiter = self.backend
 
         if not self.is_rendered:
-            self.render(interactive=False)
+            self.render(interactive=False, to_html=True)
 
         path = Path(savepath)
         if path.suffix != ".html":
