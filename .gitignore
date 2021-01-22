@@ -175,3 +175,12 @@ venv.bak/
 *.~lock.*
 
 
+# other stuff
+brainrender_code/
+virt/
+export_test.html
+export_test_alpha_1000.html
+export_test_unaltered.html
+export_test_z_translated_500.html
+exports/
+requirements.txt
