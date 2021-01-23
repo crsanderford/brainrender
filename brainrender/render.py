@@ -98,7 +98,7 @@ class Render:
 
         return axes
 
-    def _prepare_actor(self, to_html=False):
+    def _prepare_actor(self, to_html=False, matrix=None):
         """
             When an actor is first rendered, a transform matrix
             is applied to its points to correct axes orientation
@@ -111,7 +111,9 @@ class Render:
         # Flip every actor's orientation
         for actor in self.clean_actors + self.labels:
             if not actor._is_transformed:
-                if (to_html == True):
+                if matrix is not None:
+                    actor.applyTransform(matrix)
+                elif (to_html == True):
                     actor.applyTransform(mtx_html)
                 else:
                     actor.applyTransform(mtx)
@@ -147,7 +149,7 @@ class Render:
             except AttributeError:
                 pass
 
-    def render(self, interactive=None, camera=None, zoom=1.75, to_html=False, **kwargs):
+    def render(self, interactive=None, camera=None, zoom=1.75, to_html=False, matrix=None, **kwargs):
         """
             Renders the scene.
 
@@ -175,7 +177,7 @@ class Render:
             camera = set_camera(self, camera)
 
         # Apply axes correction
-        self._prepare_actor(to_html=to_html)
+        self._prepare_actor(to_html=to_html, matrix=matrix)
 
         # Apply style
         self._apply_style()
@@ -224,7 +226,7 @@ class Render:
     def close(self):
         closePlotter()
 
-    def export_vtk(self, savepath):
+    def export_vtk(self, savepath, matrix=None):
         """
             Exports the scene to a .vtk
             file.
@@ -232,7 +234,7 @@ class Render:
             :param savepath, str, Path to a .vtk file to save the export
         """
         if not self.is_rendered:
-            self.render(interactive=False, to_html=False)
+            self.render(interactive=False, to_html=False, matrix=matrix)
 
         path = Path(savepath)
         if path.suffix != ".vtm":
