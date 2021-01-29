@@ -232,17 +232,29 @@ class Render:
             :param savepath, str, Path to a .vtk file to save the export
         """
         if not self.is_rendered:
-            self.render(interactive=False, to_html=False)
+            self.render(interactive=False, to_html=True)
 
         path = Path(savepath)
-        if path.suffix != ".vtm":
-            raise ValueError("Savepath should point to a .vtm file")
+        if path.suffix not in [".vtm", ".vtk"]:
+            raise ValueError("Savepath should point to a .vtm or .vtk file")
 
-        vedo_write(self.renderables, savepath)
+        if path.suffix == ".vtm":
 
-        print(
-        f"The brainrender scene has been exported to a .vtm file. The results are saved at {path}"
-        )
+            vedo_write(self.renderables, savepath)
+
+            print(
+            f"The brainrender scene has been exported to a .vtm file. The results are saved at {path}"
+            )
+        
+        if path.suffix == ".vtk":
+        
+            for index, object in enumerate(self.renderables):
+                vedo_write(object, savepath[:-4]+f'/{savepath[:-4]}_{index}.vtk')
+
+            print(
+            f"The brainrender scene has been exported to a .vtk file. The results are saved at {path}"
+            )
+
 
         return str(path)
 
