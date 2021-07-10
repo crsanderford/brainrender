@@ -13,13 +13,20 @@ from brainrender.actors import Volume
 settings.SHOW_AXES = False
 
 
+from rich import print
+from myterial import orange
+from pathlib import Path
+
+print(f"[{orange}]Running example: {Path(__file__).name}")
+
 scene = Scene(inset=False)
 
 data = np.load("examples/data/volume.npy")
+print(data.shape)
 
 # make a volume actor and add
 actor = Volume(
-    data,
+    "examples/data/volume.npy",
     voxel_size=200,  # size of a voxel's edge in microns
     as_surface=False,  # if true a surface mesh is rendered instead of a volume
     c="Reds",  # use matplotlib colormaps to color the volume
