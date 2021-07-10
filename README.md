@@ -4,10 +4,17 @@
   <img width="1200" src="imgs/three_atlases.png">
 </p>
 
+[![Python Version](https://img.shields.io/pypi/pyversions/brainrender.svg)](https://pypi.org/project/brainrender)
+[![PyPI](https://img.shields.io/pypi/v/brainrender.svg)](https://pypi.org/project/brainrender)
+[![Build Status](https://travis-ci.com/brainglobe/brainrender.svg?branch=master)](https://travis-ci.com/brainglobe/brainrender)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Coverage Status](https://coveralls.io/repos/github/brainglobe/brainrender/badge.svg)](https://coveralls.io/github/brainglobe/brainrender)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+
 **!! NOTE: you're looking at brainrender v2.0**
 We have recently released a new version of `brainrender`, version 2.0 (:tada:). This consists of an entire re-writing of the whole library to make the code cleaner, more compact. easier to read and easier to use.
 We've also included a new GUI packaged with `brainrender`.
-However, this does mean that code written to work with previous versions of `brainrender` will need to be adjusted slightly to wrok with the newer versions.
+However, this does mean that code written to work with previous versions of `brainrender` will need to be adjusted slightly to work with the newer versions.
 If you are transitioning to the new `brainrender` version, please reade [the guide we have put together](https://docs.brainrender.info/usage/overview/v1-greater-than-v2) about moving from v1.0 to v2.0.
 
 **`brainrender` is a python package for the visualization of three dimensional neuro-anatomical data. It can be used to render data from publicly available data set (e.g. Allen Brain atlas) as well as user generated experimental data. The goal of brainrender is to facilitate the exploration and dissemination of neuro-anatomical data by providing a user-friendly platform to create high-quality 3D renderings.**
