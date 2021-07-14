@@ -186,3 +186,6 @@ export_test_unaltered.html
 export_test_z_translated_500.html
 exports/
 requirements.txt
+
+test.ipynb
+data/
