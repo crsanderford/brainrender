@@ -315,7 +315,7 @@ class Render:
         return str(path)
 
 
-    def export(self, savepath, alpha_coef=None, vmin=None, vmax=None):
+    def export(self, savepath, alpha_coef=None, vmin=None, vmax=None, colorvals=None, namevals=None):
         """
         Exports the scene to a .html
         file for online renderings.
@@ -326,7 +326,7 @@ class Render:
         _backend = self.backend
 
         if not self.is_rendered:
-            self.render(interactive=False, to_html=True)
+            self.render(interactive=False)
 
         path = Path(savepath)
         if path.suffix != ".html":
@@ -348,6 +348,18 @@ class Render:
                 plt.objects[index].alpha_coef = alpha_coef
             if (vmin is not None) and (vmax is not None):
                 plt.objects[index].color_range = [vmin, vmax]
+            if colorvals is not None:
+                plt.objects[index].color = colorvals[index]
+
+        mesh_indices = [index for index, x in enumerate(plt.objects) if isinstance(x, k3d.objects.Mesh)]
+        for index in mesh_indices: # loop over the mesh objects and apply params if they exist
+            if colorvals is not None:
+                plt.objects[index].color = colorvals[index]
+
+        indices = [index for index, x in enumerate(plt.objects)]
+        for index in indices:
+            if namevals is not None:
+                plt.objects[index].name = namevals[index]
 
         with open(path, "w") as fp:
             fp.write(plt.get_snapshot())
